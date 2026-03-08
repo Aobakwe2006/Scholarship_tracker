@@ -29,7 +29,7 @@ class Scholarship(db.Model):
     title = db.Column(db.String(200))
     description = db.Column(db.Text)
     deadline = db.Column(db.String(50))
-    closing_date=db.Colomn(date))
+    closing_date=db.Column(Date))
 
 
 class Application(db.Model):
