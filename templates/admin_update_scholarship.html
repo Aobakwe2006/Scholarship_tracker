@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Scholarship</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .form-page-wrapper {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .form-header-card {
+            background: linear-gradient(90deg, #2e7d32, #fbc02d);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .scholarship-form-card {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #1b5e20;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #d6d6d6;
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+            background: #fcfcfc;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .cancel-btn {
+            display: inline-block;
+            padding: 14px 22px;
+            border-radius: 10px;
+            background: #eeeeee;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .save-btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #2e7d32, #fbc02d);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+
+    <div class="topbar">
+        <h1>Edit Scholarship</h1>
+        <a href="{{ url_for('view_scholarships') }}">Back to Manage Scholarships</a>
+    </div>
+
+    <div class="form-page-wrapper">
+
+        <div class="form-header-card">
+            <h2>Update Scholarship</h2>
+            <p>Edit the deadline and status, then save your changes.</p>
+        </div>
+
+        <div class="scholarship-form-card">
+            <form method="POST" action="{{ url_for('edit_scholarship', id=scholarship.id) }}">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="title">Scholarship Title</label>
+                        <input type="text" id="title" name="title" value="{{ scholarship.title }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deadline">Application Deadline</label>
+                        <input type="date" id="deadline" name="deadline" value="{{ scholarship.deadline }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Scholarship Description</label>
+                    <textarea id="description" name="description" rows="4" required>{{ scholarship.description }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="requirements">Requirements</label>
+                    <textarea id="requirements" name="requirements" rows="4" required>{{ scholarship.requirements }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Scholarship Status</label>
+                    <select id="status" name="status" required>
+                        <option value="open" {% if scholarship.status == 'open' %}selected{% endif %}>Open</option>
+                        <option value="closed" {% if scholarship.status == 'closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ url_for('view_scholarships') }}" class="cancel-btn">Cancel</a>
+                    <button type="submit" class="save-btn">Update Scholarship</button>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>
