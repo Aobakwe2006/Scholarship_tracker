@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approve / Reject Applications</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .table-page { padding: 40px; }
+        .table-card { background: white; padding: 30px; border-radius: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+        .table-card h2 { color: #1b5e20; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 14px; border: 1px solid #ddd; text-align: left; }
+        th { background: #e8f5e9; color: #1b5e20; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #1b5e20; font-weight: bold; text-decoration: none; }
+        .approve { background:#1b5e20; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+        .reject { background:#c62828; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+        form { display:inline; }
+    </style>
+</head>
+<body class="dashboard-page">
+    <div class="topbar">
+        <h1>Approve / Reject Applications</h1>
+        <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+    </div>
+
+    <div class="table-page">
+        <a class="back-link" href="{{ url_for('admin_dashboard') }}">? Back</a>
+
+        <div class="table-card">
+            <h2>Under Review</h2>
+
+            {% if applications %}
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Student</th>
+                    <th>Scholarship</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                {% for application in applications %}
+                <tr>
+                    <td>{{ application.id }}</td>
+                    <td>{{ application.student_id }}</td>
+                    <td>{{ application.scholarship.title }}</td>
+                    <td>{{ application.status }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('application_decision', app_id=application.id) }}">
+                            <button class="approve" type="submit" name="decision" value="approve">Approve</button>
+                            <button class="reject" type="submit" name="decision" value="reject">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+                <p>No applications awaiting decision.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Notifications</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .notification-page {
+            padding: 40px;
+        }
+
+        .notification-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            margin-bottom: 15px;
+            border-left: 6px solid #fbc02d;
+        }
+
+        .notification-card p {
+            margin: 0;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .notification-header {
+            margin-bottom: 20px;
+        }
+
+        .notification-header h2 {
+            color: #1b5e20;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #1b5e20;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body class="dashboard-page">
+
+    <div class="topbar">
+        <h1>Notifications</h1>
+        <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+    </div>
+
+    <div class="notification-page">
+        <a class="back-link" href="{{ url_for('admin_dashboard') }}">← Back</a>
+
+        <div class="notification-header">
+            <h2>Admin Notifications</h2>
+        </div>
+
+        {% if notifications %}
+            {% for notification in notifications %}
+                <div class="notification-card">
+                    <p>{{ notification.message }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="notification-card">
+                <p>No notifications found.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>
