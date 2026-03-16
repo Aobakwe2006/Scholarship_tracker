@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+        .panel { background:#fff; padding:20px; border-radius:14px; box-shadow:0 6px 16px rgba(0,0,0,0.08); }
+        .panel h3 { margin-top:0; color:#1b5e20; }
+        .field { margin-bottom:12px; }
+        .field label { display:block; font-weight:bold; margin-bottom:6px; color:#1b5e20; }
+        .field input { width:100%; padding:10px; border:1px solid #cfcfcf; border-radius:8px; }
+        .btn { background:#1b5e20; color:white; border:none; padding:10px 14px; border-radius:8px; cursor:pointer; }
+        .doc-card { background:#f9fff9; padding:14px; border-radius:12px; border:1px solid #e0e0e0; }
+        .status { color:#555; font-size:14px; margin:6px 0; }
+        .notice { margin-bottom:12px; font-weight:bold; color:#1b5e20; }
+        .error { color:#c62828; font-weight:bold; margin-bottom:12px; }
+    </style>
+</head>
+<body class="dashboard-page">
+    <div class="topbar">
+        <h1>Student Profile</h1>
+        <a href="{{ url_for('student_dashboard') }}">Back to Dashboard</a>
+    </div>
+
+    <div class="main-content" style="padding:24px;">
+        {% if message %}<div class="notice">{{ message }}</div>{% endif %}
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+        <div class="profile-grid">
+            <div class="panel">
+                <h3>Your Details</h3>
+                <form method="post">
+                    <input type="hidden" name="form_type" value="info">
+                    <div class="field">
+                        <label for="student_number">Student Number</label>
+                        <input type="text" id="student_number" name="student_number" value="{{ student.student_number or '' }}">
+                    </div>
+                    <div class="field">
+                        <label for="course">Course</label>
+                        <input type="text" id="course" name="course" value="{{ student.course or '' }}">
+                    </div>
+                    <div class="field">
+                        <label for="year_level">Year Level</label>
+                        <input type="text" id="year_level" name="year_level" value="{{ student.year_level or '' }}">
+                    </div>
+                    <button class="btn" type="submit">Save Details</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h3>Required Documents</h3>
+                {% for key,label in required_docs.items() %}
+                    {% set doc = docs.get(key) %}
+                    <div class="doc-card">
+                        <strong>{{ label }}</strong>
+                        <div class="status">
+                            {% if doc %}
+                                Uploaded {{ doc.uploaded_at.strftime('%Y-%m-%d') }}
+                                {% if doc.certified_date %}<br>Certified on: {{ doc.certified_date }}{% endif %}
+                                <br><a href="{{ url_for('static', filename='uploads/' + doc.filename) }}" target="_blank">View file</a>
+                            {% else %}
+                                Not uploaded yet
+                            {% endif %}
+                        </div>
+                        <form method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="form_type" value="doc_upload">
+                            <input type="hidden" name="doc_type" value="{{ key }}">
+                            {% if key == 'certified_id' %}
+                                <div class="field">
+                                    <label for="certified_date">Certification Date (must be within last 3 months)</label>
+                                    <input type="date" name="certified_date" required>
+                                </div>
+                            {% endif %}
+                            <div class="field">
+                                <label>Upload file</label>
+                                <input type="file" name="document" required>
+                            </div>
+                            <button class="btn" type="submit">Upload {{ label }}</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
