@@ -107,7 +107,17 @@
             <form method="post">
                 <label>Title</label>
                 <input type="text" name="title" placeholder="e.g. Merit-Based Bursary" required>
-
+                <label>Department</label>
+                <select name="department" required class="form-control">
+                    <option value="" disabled selected>Select Department</option>
+                    <option value="IT">Information Technology</option>
+                    <option value="IS">Information Systems</option>
+                    <option value="FIM">Finance and Information Management</option>
+                    <option value="FA">Financial Accounting</option>
+                    <option value="ICM">Information and Corporate Management</option>
+                    <option value="MA">Management Accounting</option>
+                    <option value="AT">Auditing and Taxation</option>
+                </select>
                 <label>Description</label>
                 <textarea name="description" rows="3" required></textarea>
 

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bursary24 | Find Your Future</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .hero {
+            background: linear-gradient(rgba(27, 94, 32, 0.8), rgba(27, 94, 32, 0.8)), url('/static/hero-bg.jpg');
+            background-size: cover;
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .scholarship-grid {
+            display: flex;
+            flex-direction: column;
+            padding: 20px 15%; 
+            gap: 0; 
+        }
+
+        .preview-card {
+            cursor: pointer;
+            background: #fff;
+            padding: 30px 10px;
+            /* This creates the grayish line separating the cards */
+            border-bottom: 1px solid #e0e0e0; 
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.2s;
+        }
+
+        .preview-card:hover {
+            background-color: #f1f8e9; 
+        }
+
+        .preview-card:last-child {
+            border-bottom: none; /* Removes line from the last item */
+        }
+        modal-content h4:first-of-type {
+        margin-top: 40px; /* Adjust this to increase/decrease the gap from the title */
+        color: #1b5e20;
+        }
+        #modalDesc {
+        margin-bottom: 40px; 
+        line-height: 1.6;     
+         }
+
+        .modal-content h4:last-of-type {
+        margin-top: 20px;
+        }
+
+        .modal-content hr {
+         margin-top: 10px;
+        margin-bottom: 20px;
+        border: 0;
+        border-top: 1px solid #eee;
+        }
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 50%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .apply-btn {
+            display: inline-block;
+            margin-top: 15px;
+            background: #1b5e20;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav class="topbar">
+        <h1>ScholarMates</h1>
+        <div>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}" style="margin-left:15px;">Register</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h2>Empowering South African Students</h2>
+        <p>Browse available scholarships and start your application today.</p>
+    </header>
+
+    <div class="filter-container" style="padding: 20px 10%; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+        <input type="text" id="search-input" onkeyup="filterScholarships()" placeholder="Search by scholarship name..." 
+               style="padding: 10px; border-radius: 8px; border: 1px solid #1b5e20; width: 300px;">
+
+        <select id="dept-filter" onchange="filterScholarships()" style="padding: 10px; border-radius: 8px; border: 1px solid #1b5e20;">
+            <option value="all">All Departments</option>
+            <option value="IT">Information Technology</option>
+            <option value="IS">Information Systems</option>
+            <option value="FIM">Finance and Information Management</option>
+            <option value="FA">Financial Accounting</option>
+            <option value="ICM">Information and Corporate Management</option>
+            <option value="MA">Management Accounting</option>
+            <option value="AT">Auditing and Taxation</option>
+        </select>
+        
+        <button type="button" onclick="resetDropdown()" style="padding: 10px 15px; background: none; border: 1px solid #666; border-radius: 8px; cursor: pointer; color: #666;">
+            Clear Filter
+        </button>
+    </div>
+
+    <main class="scholarship-grid" id="scholarship-container">
+        {% for s in scholarships %}
+        <div class="preview-card" 
+             data-dept="{{ s.department }}" 
+             data-title="{{ s.title }}"
+             data-desc="{{ s.description }}"
+             data-req="{{ s.requirements }}"
+             onclick="openModal(this)">
+            
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <div>
+                    <span class="dept-tag" style="font-size: 0.8rem; color: #1b5e20; font-weight: bold;">{{ s.department }}</span>
+                    <h3 style="margin: 5px 0;">{{ s.title }}</h3>
+                </div>
+                <span style="font-size: 0.85rem; color: #888;">Deadline: {{ s.deadline }}</span>
+            </div>
+            <p style="color: #666; margin: 10px 0 0 0;">{{ s.description|striptags|truncate(150) }}</p>
+        </div>
+        {% endfor %}
+    </main>
+
+    <div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle" style="color: #1b5e20;"></h2>
+        <hr>
+        
+        <h4>Description</h4>
+        <div id="modalDesc"></div> <h4>Requirements</h4>
+        <div id="modalReq"></div>
+        
+        <div style="margin-top: 30px; text-align: right;">
+            <a href="{{ url_for('login') }}" class="apply-btn">Login to Apply</a>
+        </div>
+    </div>
+</div>
+
+    <script>
+        // 1. Filtering Logic
+        function filterScholarships() {
+            const filterValue = document.getElementById('dept-filter').value;
+            const searchVal = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.getElementsByClassName('preview-card');
+
+            for (let card of cards) {
+                const title = card.querySelector('h3').innerText.toLowerCase();
+                const cardDept = card.getAttribute('data-dept');
+
+                const matchesSearch = title.includes(searchVal);
+                const matchesDept = (filterValue === 'all' || cardDept === filterValue);
+
+                if (matchesSearch && matchesDept) {
+                    card.style.display = 'flex'; 
+                } else {
+                    card.style.display = 'none';
+                }
+            }
+        }
+
+        // 2. Reset Logic
+        function resetDropdown() {
+            document.getElementById('dept-filter').value = 'all';
+            document.getElementById('search-input').value = '';
+            filterScholarships();
+        }
+
+        // 3. Modal Logic
+        function openModal(card) {
+            const title = card.getAttribute('data-title');
+            const desc = card.getAttribute('data-desc');
+            const req = card.getAttribute('data-req');
+
+            document.getElementById('modalTitle').innerText = title;
+            // Use innerHTML in case your description has <p> or <ul> tags from the admin side
+            document.getElementById('modalDesc').innerHTML = desc;
+            document.getElementById('modalReq').innerHTML = req;
+
+            document.getElementById('detailsModal').style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            let modal = document.getElementById('detailsModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
